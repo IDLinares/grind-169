@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Carousel Component</title>
+		<style>
+			body {
+				font-family: 'Arial', sans-serif;
+				background-color: #f5f5f5;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+			}
+
+			.carousel-container {
+				width: 80%;
+				max-width: 1200px;
+				background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+				border-radius: 20px;
+				box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+				position: relative;
+				overflow: hidden;
+				padding: 20px;
+			}
+
+			.carousel-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 20px;
+			}
+
+			.carousel-title {
+				font-size: 24px;
+				font-weight: bold;
+				color: #1a1a1a;
+			}
+
+			.carousel-icon {
+				width: 60px;
+				height: 60px;
+				background: #000;
+				border-radius: 10px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #fff;
+				font-size: 30px;
+			}
+
+			.carousel-content {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				position: relative;
+				height: 400px;
+			}
+
+			.content-text {
+				width: 50%;
+			}
+
+			.content-text h2 {
+				font-size: 28px;
+				color: #1a1a1a;
+				margin-bottom: 10px;
+			}
+
+			.content-text p {
+				font-size: 16px;
+				color: #666;
+				margin-bottom: 20px;
+			}
+
+			.content-text button {
+				background: #1a1a1a;
+				color: #fff;
+				border: none;
+				padding: 10px 20px;
+				border-radius: 50px;
+				cursor: pointer;
+				font-size: 16px;
+				transition: background 0.3s;
+			}
+
+			.content-text button:hover {
+				background: #333;
+			}
+
+			.content-image {
+				width: 50%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.content-image img {
+				max-width: 100%;
+				border-radius: 10px;
+			}
+
+			.carousel-slide {
+				position: absolute;
+				width: 100%;
+				display: flex;
+				transition: transform 0.5s ease-in-out;
+			}
+
+			.carousel-arrow {
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				background: rgba(0, 0, 0, 0.5);
+				color: #fff;
+				border: none;
+				padding: 10px;
+				cursor: pointer;
+				font-size: 24px;
+				border-radius: 50%;
+				z-index: 10;
+			}
+
+			.carousel-arrow.left {
+				left: 10px;
+			}
+
+			.carousel-arrow.right {
+				right: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="carousel-container">
+			<div class="carousel-header">
+				<div class="carousel-title" id="carousel-title">Field Sales</div>
+				<div class="carousel-icon" id="carousel-icon">FS</div>
+			</div>
+			<div class="carousel-content" id="carousel-content">
+				<div class="carousel-slide" id="carousel-slide">
+					<!-- Slides will be dynamically added here -->
+				</div>
+			</div>
+			<button class="carousel-arrow left" onclick="navigateCarousel(-1)">&#8249;</button>
+			<button class="carousel-arrow right" onclick="navigateCarousel(1)">&#8250;</button>
+		</div>
+
+		<script>
+			const options = [
+				{
+					title: 'Field Sales',
+					icon: 'FS',
+					description: 'Equip your field reps with an intelligent app that accelerates deals while giving managers real-time performance insights.',
+					image: 'https://via.placeholder.com/500x300?text=Field+Sales+Image',
+				},
+				{
+					title: 'Portals',
+					icon: 'P',
+					description: 'Create custom portals that serve as a central hub for your customers, employees, or investors.',
+					image: 'https://via.placeholder.com/500x300?text=Portals+Image',
+				},
+				{
+					title: 'Dashboards',
+					icon: 'D',
+					description: "Uncover insights and drive performance with an intuitive dashboard that visualizes your company's key metrics in real-time.",
+					image: 'https://via.placeholder.com/500x300?text=Dashboards+Image',
+				},
+				{
+					title: 'CRM',
+					icon: 'C',
+					description: "Build a flexible CRM that's tailored to your business's processes, workflows, and industry.",
+					image: 'https://via.placeholder.com/500x300?text=CRM+Image',
+				},
+				{
+					title: 'Inventory',
+					icon: 'I',
+					description: 'Track parts and supplies, manage stock levels, and streamline processes.',
+					image: 'https://via.placeholder.com/500x300?text=Inventory+Image',
+				},
+			];
+
+			let currentIndex = 0;
+
+			function updateCarousel() {
+				const slideContainer = document.getElementById('carousel-slide');
+				slideContainer.innerHTML = '';
+
+				options.forEach((option, index) => {
+					const slide = document.createElement('div');
+					slide.className = 'carousel-slide';
+					slide.style.transform = `translateX(${(index - currentIndex) * 100}%)`;
+					slide.innerHTML = `
+                    <div class="content-text">
+                        <h2>${option.description.split('.')[0]}.</h2>
+                        <p>${option.description}</p>
+                        <button>See use case</button>
+                    </div>
+                    <div class="content-image">
+                        <img src="${option.image}" alt="${option.title}">
+                    </div>
+                `;
+					slideContainer.appendChild(slide);
+				});
+
+				document.getElementById('carousel-title').textContent = options[currentIndex].title;
+				document.getElementById('carousel-icon').textContent = options[currentIndex].icon;
+			}
+
+			function navigateCarousel(direction) {
+				currentIndex = (currentIndex + direction + options.length) % options.length;
+				updateCarousel();
+			}
+
+			// Initial render
+			updateCarousel();
+		</script>
+	</body>
+</html>

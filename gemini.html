@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Glide-Style Carousel Component</title>
+		<style>
+			/* Basic Reset & Font Setup */
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+					'Helvetica Neue', sans-serif;
+				background-color: #f0f2f5; /* Light background similar to many modern sites */
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				min-height: 100vh;
+				color: #1a202c; /* Default dark text color */
+			}
+
+			/* Wrapper for Component and Arrows */
+			.component-wrapper {
+				display: flex;
+				align-items: center;
+				gap: 20px; /* Space between arrows and component */
+				padding: 20px; /* Ensure arrows aren't cut off at screen edge */
+				max-width: 1100px; /* Max width for the whole setup */
+				width: 100%;
+			}
+
+			/* Arrow Styling */
+			.carousel-arrow {
+				background-color: #fff;
+				border: 1px solid #e2e8f0;
+				border-radius: 50%;
+				width: 40px;
+				height: 40px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-size: 20px;
+				font-weight: bold;
+				color: #4a5568;
+				cursor: pointer;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+				transition: background-color 0.2s ease, box-shadow 0.2s ease;
+				flex-shrink: 0; /* Prevent arrows from shrinking */
+			}
+
+			.carousel-arrow:hover {
+				background-color: #f7fafc;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+			}
+
+			/* Main Component Container */
+			.glide-component {
+				background: linear-gradient(to bottom, #ffffff 80%, #f0f8ff 100%); /* Subtle gradient like the example */
+				border-radius: 16px;
+				padding: 32px 40px; /* Generous padding */
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08), 0 5px 10px rgba(0, 0, 0, 0.04);
+				overflow: hidden; /* Important for containing the carousel */
+				flex-grow: 1; /* Allow component to take available space */
+				display: flex;
+				flex-direction: column;
+				width: 100%; /* Ensure it takes width within the wrapper */
+				min-height: 500px; /* Give it some default height */
+			}
+
+			/* Component Header */
+			.component-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 24px;
+				min-height: 40px; /* Ensure space even if icon/title are small */
+			}
+
+			.component-title {
+				font-size: 24px; /* Larger font size for the title */
+				font-weight: 600; /* Semibold */
+				color: #1a202c;
+			}
+
+			.component-icon {
+				width: 40px;
+				height: 40px;
+				background-color: #e2e8f0; /* Placeholder background */
+				border-radius: 8px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-size: 12px;
+				color: #4a5568;
+				font-weight: 500;
+				/* In a real scenario, you'd use an <img> or SVG here */
+				border: 1px dashed #cbd5e0; /* Indicate placeholder */
+			}
+
+			/* Carousel Area */
+			.carousel-container {
+				overflow: hidden; /* Crucial: Hides slides outside the viewport */
+				position: relative;
+				flex-grow: 1; /* Take remaining vertical space */
+				width: 100%;
+			}
+
+			.carousel-track {
+				display: flex;
+				transition: transform 0.5s ease-in-out; /* The sliding animation */
+				height: 100%; /* Ensure track fills container height */
+			}
+
+			.carousel-item {
+				flex: 0 0 100%; /* Each item takes full width */
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 40px; /* Space between text content and image */
+				padding: 10px 0; /* Add some vertical padding within the slide */
+				height: 100%;
+			}
+
+			/* Content within each item */
+			.item-content {
+				flex: 1; /* Allow text content to take available space */
+				max-width: 50%; /* Limit text width */
+			}
+
+			.item-description {
+				font-size: 16px;
+				line-height: 1.6;
+				color: #4a5568; /* Slightly lighter text color */
+				margin-bottom: 24px;
+			}
+
+			.item-button {
+				background-color: #1a202c; /* Black button */
+				color: #ffffff;
+				border: none;
+				padding: 12px 24px;
+				border-radius: 8px;
+				font-size: 14px;
+				font-weight: 500;
+				cursor: pointer;
+				transition: background-color 0.2s ease;
+			}
+
+			.item-button:hover {
+				background-color: #2d3748; /* Slightly lighter black on hover */
+			}
+
+			.item-image-container {
+				flex: 1;
+				max-width: 45%; /* Limit image width */
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.item-image {
+				max-width: 100%;
+				height: auto;
+				max-height: 400px; /* Max height for the placeholder */
+				background-color: #e2e8f0; /* Placeholder background */
+				border: 1px dashed #cbd5e0; /* Placeholder border */
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: #718096;
+				font-size: 14px;
+				aspect-ratio: 9 / 19; /* Approximate phone aspect ratio */
+				border-radius: 12px; /* Rounded corners for the image/phone */
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+			}
+
+			/* Basic Responsiveness */
+			@media (max-width: 768px) {
+				.component-wrapper {
+					flex-direction: column;
+					gap: 15px;
+				}
+				.glide-component {
+					padding: 20px;
+				}
+				.carousel-item {
+					flex-direction: column; /* Stack image and text */
+					text-align: center;
+					gap: 20px;
+				}
+				.item-content,
+				.item-image-container {
+					max-width: 100%;
+				}
+				.item-image {
+					max-height: 300px;
+				}
+				.component-title {
+					font-size: 20px;
+				}
+				.carousel-arrow {
+					/* Stack arrows horizontally below component on small screens */
+					order: 1; /* Place arrows after the component */
+				}
+				.glide-component {
+					order: 0;
+				}
+				/* Put arrows side-by-side below */
+				.arrow-container {
+					display: flex;
+					justify-content: center;
+					gap: 20px;
+					width: 100%;
+					order: 1; /* Make sure this appears after the component */
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="component-wrapper">
+			<div class="arrow-container">
+				<button class="carousel-arrow" id="prevBtn" aria-label="Previous Slide">&#8592;</button>
+			</div>
+
+			<div class="glide-component">
+				<div class="component-header">
+					<span class="component-title" id="componentTitle">Loading...</span>
+					<div class="component-icon" id="componentIcon">ICON</div>
+				</div>
+				<div class="carousel-container">
+					<div class="carousel-track" id="carouselTrack"></div>
+				</div>
+			</div>
+
+			<div class="arrow-container">
+				<button class="carousel-arrow" id="nextBtn" aria-label="Next Slide">&#8594;</button>
+			</div>
+		</div>
+
+		<script>
+			const slidesData = [
+				{
+					title: 'Field Sales',
+					iconText: 'FS', // Placeholder text for icon
+					description:
+						'Your AI wingman in the field. Equip your field reps with an intelligent app that accelerates deals while giving managers real-time performance insights.',
+					imgPlaceholder: 'Phone Mockup 1',
+				},
+				{
+					title: 'Portals',
+					iconText: 'P',
+					description: 'Build custom portals for your customers, partners, or employees. Share data securely and streamline communication workflows.',
+					imgPlaceholder: 'Phone Mockup 2',
+				},
+				{
+					title: 'Dashboards',
+					iconText: 'D',
+					description:
+						'Visualize your key metrics in real-time. Create interactive dashboards that pull data from multiple sources for quick insights.',
+					imgPlaceholder: 'Phone Mockup 3',
+				},
+				{
+					title: 'CRM',
+					iconText: 'CRM',
+					description: 'Manage your customer relationships effectively. Track leads, deals, and interactions all in one place, accessible anywhere.',
+					imgPlaceholder: 'Phone Mockup 4',
+				},
+				{
+					title: 'Inventory',
+					iconText: 'I',
+					description: 'Keep track of your stock levels, manage assets, and streamline inventory processes with a custom-built mobile app.',
+					imgPlaceholder: 'Phone Mockup 5',
+				},
+			];
+
+			const track = document.getElementById('carouselTrack');
+			const titleEl = document.getElementById('componentTitle');
+			const iconEl = document.getElementById('componentIcon');
+			const nextBtn = document.getElementById('nextBtn');
+			const prevBtn = document.getElementById('prevBtn');
+
+			let currentIndex = 0;
+			let slideWidth = 0; // We'll update this dynamically if needed, but 100% works well here
+
+			// Function to create and add slides to the DOM
+			function createSlides() {
+				track.innerHTML = ''; // Clear existing slides
+				slidesData.forEach((slide, index) => {
+					const slideElement = document.createElement('div');
+					slideElement.classList.add('carousel-item');
+					slideElement.innerHTML = `
+                    <div class="item-content">
+                        <p class="item-description">${slide.description}</p>
+                        <button class="item-button">See use case</button>
+                    </div>
+                    <div class="item-image-container">
+                        <div class="item-image"><span>${slide.imgPlaceholder}</span></div>
+                    </div>
+                `;
+					track.appendChild(slideElement);
+				});
+				// Add dummy clones for infinite loop illusion if desired (optional)
+			}
+
+			// Function to update the carousel display
+			function updateCarousel(index, direction = 'next') {
+				const totalSlides = slidesData.length;
+				currentIndex = (index + totalSlides) % totalSlides; // Wrap around logic
+
+				// Update Header
+				titleEl.textContent = slidesData[currentIndex].title;
+				iconEl.textContent = slidesData[currentIndex].iconText; // Update icon placeholder text
+
+				// Update Track Position for Sliding Effect
+				const offset = -currentIndex * 100; // Calculate percentage offset
+				track.style.transform = `translateX(${offset}%)`;
+
+				// Optional: Add transition classes for directionality (more complex)
+				// track.classList.remove('slide-left', 'slide-right');
+				// void track.offsetWidth; // Trigger reflow
+				// if (direction === 'next') {
+				//     track.classList.add('slide-left');
+				// } else {
+				//     track.classList.add('slide-right');
+				// }
+			}
+
+			// Event Listeners for Arrows
+			nextBtn.addEventListener('click', () => {
+				updateCarousel(currentIndex + 1, 'next');
+			});
+
+			prevBtn.addEventListener('click', () => {
+				updateCarousel(currentIndex - 1, 'prev');
+			});
+
+			// Keyboard navigation (optional)
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'ArrowRight') {
+					updateCarousel(currentIndex + 1, 'next');
+				} else if (e.key === 'ArrowLeft') {
+					updateCarousel(currentIndex - 1, 'prev');
+				}
+			});
+
+			// Initial Setup
+			createSlides();
+			updateCarousel(0); // Initialize to the first slide
+
+			// Adjust layout on resize if necessary (e.g., recalculating widths)
+			// window.addEventListener('resize', () => {
+			// updateCarousel(currentIndex); // Re-apply styles, might be needed if using JS for widths
+			// });
+
+			// --- Adjust Arrow container visibility based on screen size ---
+			const handleResize = () => {
+				const wrapper = document.querySelector('.component-wrapper');
+				const arrowContainers = document.querySelectorAll('.arrow-container');
+				const component = document.querySelector('.glide-component');
+
+				if (window.innerWidth <= 768) {
+					// Small screen: use flex-direction column on wrapper, show both arrow containers
+					wrapper.style.flexDirection = 'column';
+					arrowContainers.forEach((ac) => {
+						// Ensure they are displayed and arranged by the column layout
+						ac.style.display = 'flex';
+						// Put arrows side-by-side below
+						ac.style.justifyContent = 'center';
+						ac.style.gap = '20px';
+						ac.style.width = '100%';
+						ac.style.order = '1'; // Place after component
+					});
+					component.style.order = '0'; // Ensure component comes first
+					// Hide original side arrows if they were separate elements (not needed with current structure)
+				} else {
+					// Large screen: use flex-direction row, show arrows beside component
+					wrapper.style.flexDirection = 'row';
+					// Show only the relevant arrow container (left/right)
+					// We re-use the same containers but they are positioned by the row flex layout
+					arrowContainers.forEach((ac) => {
+						ac.style.display = 'flex';
+						ac.style.justifyContent = 'center'; // Reset justification
+						ac.style.gap = '0'; // Reset gap
+						ac.style.width = 'auto'; // Reset width
+						ac.style.order = 'unset'; // Reset order
+					});
+					component.style.order = 'unset';
+
+					// Specific alignment for arrows
+					document.querySelector('.arrow-container:first-of-type').style.justifyContent = 'flex-end';
+					document.querySelector('.arrow-container:last-of-type').style.justifyContent = 'flex-start';
+				}
+			};
+
+			window.addEventListener('resize', handleResize);
+			document.addEventListener('DOMContentLoaded', handleResize); // Initial check
+		</script>
+	</body>
+</html>
